@@ -47,7 +47,7 @@ Worth a 15-min look?
 
 Best,
 Greg Pober
-CFO, I AM CFO
+CEO, I AM CFO
 P: 954-257-2856
 https://info.iamcfo.com
 
