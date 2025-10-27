@@ -39,7 +39,7 @@ Worth a 15-min demo?
 https://calendly.com/greg-iamcfo/demo
 
 - Greg
-CFO, I AM CFO"""
+CEO, I AM CFO"""
 
 FOLLOWUP_3 = """Subject: Last one from me
 
