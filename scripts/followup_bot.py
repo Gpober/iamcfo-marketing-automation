@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from supabase import create_client, Client
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+import anthropic
 
 # Initialize clients
 supabase: Client = create_client(
@@ -17,6 +18,7 @@ supabase: Client = create_client(
     os.getenv('SUPABASE_SERVICE_KEY')
 )
 sendgrid = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+claude = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 
 SENDER_EMAIL = 'gpober@iamcfo.com'
 SENDER_NAME = 'Greg Pober - I AM CFO'
@@ -39,7 +41,7 @@ Worth a 15-min demo?
 https://calendly.com/greg-iamcfo/demo
 
 - Greg
-CEO, I AM CFO"""
+CFO, I AM CFO"""
 
 FOLLOWUP_3 = """Subject: Last one from me
 
@@ -64,7 +66,7 @@ def get_prospects_for_followup(step):
     """Get prospects who need follow-up"""
     try:
         # Get prospects at previous step who haven't replied
-        days_ago = 4 if step == 2 else 7
+        days_ago = 2 if step == 2 else 3  # 2 days for step 2, 3 days for step 3
         cutoff_date = (datetime.now() - timedelta(days=days_ago)).isoformat()
         
         response = supabase.table('prospects')\
@@ -82,13 +84,16 @@ def get_prospects_for_followup(step):
 def send_followup(prospect, template, step):
     """Send follow-up email"""
     try:
+        # Format template
         first_name = prospect.get('first_name', 'there')
         body = template.format(first_name=first_name)
         
+        # Extract subject
         lines = body.split('\n', 1)
         subject = lines[0].replace('Subject:', '').strip()
         email_body = lines[1].strip() if len(lines) > 1 else body
         
+        # Send email
         message = Mail(
             from_email=(SENDER_EMAIL, SENDER_NAME),
             to_emails=prospect['email'],
@@ -96,8 +101,9 @@ def send_followup(prospect, template, step):
             plain_text_content=email_body
         )
         
-        sendgrid.send(message)
+        response = sendgrid.send(message)
         
+        # Update database
         supabase.table('prospects').update({
             'sequence_step': step,
             'last_followup_at': datetime.now().isoformat()
@@ -107,27 +113,42 @@ def send_followup(prospect, template, step):
         return True
         
     except Exception as e:
-        print(f"❌ Failed: {e}")
+        print(f"❌ Failed to send follow-up to {prospect['email']}: {e}")
         return False
 
 def main():
+    """Main execution"""
     print("=" * 60)
     print("🔄 I AM CFO FOLLOW-UP BOT")
     print("=" * 60)
+    print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("-" * 60)
     
     total_sent = 0
     
-    print("\n📧 Follow-up #2 (4 days after initial)...")
-    for prospect in get_prospects_for_followup(2):
+    # Process follow-up 2 (4 days after initial)
+    print("\n📧 Processing Follow-up #2 (4 days after initial)...")
+    prospects_step2 = get_prospects_for_followup(2)
+    print(f"   Found {len(prospects_step2)} prospects")
+    
+    for prospect in prospects_step2:
         if send_followup(prospect, FOLLOWUP_2, 2):
             total_sent += 1
     
-    print("\n📧 Follow-up #3 (7 days after #2)...")
-    for prospect in get_prospects_for_followup(3):
+    # Process follow-up 3 (7 days after follow-up 2)
+    print("\n📧 Processing Follow-up #3 (7 days after follow-up #2)...")
+    prospects_step3 = get_prospects_for_followup(3)
+    print(f"   Found {len(prospects_step3)} prospects")
+    
+    for prospect in prospects_step3:
         if send_followup(prospect, FOLLOWUP_3, 3):
             total_sent += 1
     
-    print(f"\n✅ Total sent: {total_sent}")
+    print("\n" + "=" * 60)
+    print("✅ FOLLOW-UP COMPLETE!")
+    print("=" * 60)
+    print(f"   Total sent: {total_sent}")
+    print("=" * 60)
 
 if __name__ == '__main__':
     main()
