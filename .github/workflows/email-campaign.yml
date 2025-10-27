@@ -27,7 +27,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install supabase-py sendgrid anthropic python-dotenv
+          pip install -r requirements.txt
       
       - name: Send email batch
         env:
@@ -65,7 +65,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install supabase-py sendgrid anthropic python-dotenv
+          pip install -r requirements.txt
       
       - name: Send follow-up emails
         env:
