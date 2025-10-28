@@ -54,7 +54,7 @@ One {industry} owner told me: "I spent 3 hours last month trying to figure out i
 
 Worth 15 minutes to see it?
 
-👉 https://info.iamcfo.com
+👉 {tracking_link}
 
 — 
 Greg Pober
@@ -90,7 +90,7 @@ After I AM CFO:
 
 The difference? Real-time cash flow visibility.
 
-See it yourself: https://info.iamcfo.com
+See it yourself: {tracking_link}
 
 — 
 Greg Pober
@@ -118,7 +118,7 @@ I AM CFO gives you the answer in real-time.
 
 $699/month to stop guessing about your cash flow.
 
-See it: https://info.iamcfo.com
+See it: {tracking_link}
 
 — 
 Greg
@@ -151,7 +151,7 @@ I AM CFO shows you:
 
 A GC in Tampa told me: "I used to spend Friday afternoons doing cash flow math. Now I check my phone. Takes 30 seconds."
 
-See it: https://info.iamcfo.com
+See it: {tracking_link}
 
 — 
 Greg Pober
@@ -171,7 +171,7 @@ One GC found they were underbidding by 12% on concrete work. Caught it week 1 in
 
 That's 57 months of I AM CFO paid for by one insight.
 
-See your real-time job costs: https://info.iamcfo.com
+See your real-time job costs: {tracking_link}
 
 — 
 Greg Pober
@@ -189,7 +189,7 @@ The gap between you and them is growing.
 
 $699/month to stop flying blind.
 
-https://info.iamcfo.com
+{tracking_link}
 
 — 
 Greg"""
@@ -215,7 +215,7 @@ I AM CFO shows you:
 
 A restaurant group told me: "We discovered one location was losing $4K/month. Fixed it in week 1 instead of finding out in month 3."
 
-See your real-time restaurant numbers: https://info.iamcfo.com
+See your real-time restaurant numbers: {tracking_link}
 
 — 
 Greg Pober
@@ -237,7 +237,7 @@ I AM CFO shows food cost percentage daily. By location. In real-time.
 
 One 3-location group found their downtown spot was 6% higher than the other two. Fixed vendor pricing. Added $48K/year profit.
 
-See your real-time food cost: https://info.iamcfo.com
+See your real-time food cost: {tracking_link}
 
 — 
 Greg Pober
@@ -251,7 +251,7 @@ No response — I get it.
 
 If you ever want to see which locations are actually profitable (in real-time, not month-end), you know where to find me.
 
-https://info.iamcfo.com
+{tracking_link}
 
 — 
 Greg"""
@@ -275,7 +275,7 @@ I AM CFO shows you:
 
 An HVAC company in Miami told me: "We saw we had $65K available. Bought 2 trucks. Took on 40% more jobs. Grew faster than we thought possible."
 
-See your real-time cash position: https://info.iamcfo.com
+See your real-time cash position: {tracking_link}
 
 — 
 Greg Pober
@@ -300,7 +300,7 @@ I AM CFO shows you real-time:
 
 One HVAC company found they were sitting on $35K in parts inventory they didn't need. Liquidated it. Freed up cash for the trucks they did need.
 
-See where your cash is going: https://info.iamcfo.com
+See where your cash is going: {tracking_link}
 
 — 
 Greg Pober
@@ -318,12 +318,46 @@ Or you can see it in real-time.
 
 $699/month vs. guessing wrong on a $50K decision.
 
-https://info.iamcfo.com
+{tracking_link}
 
 — 
 Greg"""
     },
 }
+
+
+def generate_tracking_link(campaign, source, medium, content, industry=None):
+    """
+    Generate UTM-tracked link for info.iamcfo.com
+    
+    Args:
+        campaign: followup_1, followup_2, followup_3
+        source: email
+        medium: followup
+        content: prospect email or ID
+        industry: construction, restaurant, hvac, etc.
+    
+    Returns:
+        Full URL with UTM parameters
+    """
+    base_url = "https://info.iamcfo.com"
+    
+    # Build UTM parameters
+    params = {
+        'utm_source': source,
+        'utm_medium': medium,
+        'utm_campaign': campaign,
+        'utm_content': content
+    }
+    
+    # Add industry if available
+    if industry:
+        params['utm_term'] = industry.lower().replace(' ', '_')
+    
+    # Build query string
+    query_string = '&'.join([f"{k}={v}" for k, v in params.items()])
+    
+    return f"{base_url}?{query_string}"
 
 
 def get_industry_followup(industry, step):
@@ -378,6 +412,17 @@ def send_followup(prospect, step):
     try:
         first_name = prospect.get('first_name', 'there').strip() or 'there'
         industry = prospect.get('industry', '')
+        prospect_email = prospect.get('email', '')
+        
+        # Generate tracking link
+        campaign = f"followup_{step}"
+        tracking_link = generate_tracking_link(
+            campaign=campaign,
+            source='email',
+            medium='followup',
+            content=prospect_email,
+            industry=industry
+        )
         
         # Try to get industry-specific follow-up
         industry_template = get_industry_followup(industry, step)
@@ -386,7 +431,8 @@ def send_followup(prospect, step):
             # Use industry-specific template
             body = industry_template.format(
                 first_name=first_name,
-                industry=industry
+                industry=industry,
+                tracking_link=tracking_link
             )
         else:
             # Use generic follow-up
@@ -399,7 +445,8 @@ def send_followup(prospect, step):
             
             body = template.format(
                 first_name=first_name,
-                industry=industry if industry else 'business'
+                industry=industry if industry else 'business',
+                tracking_link=tracking_link
             )
         
         # Extract subject and email body
