@@ -52,46 +52,85 @@ SENDER_EMAIL = 'gpober@iamcfo.com'
 SENDER_NAME = 'Greg Pober - I AM CFO'
 
 # ============================================================================
-# EMAIL TEMPLATE - Daily Cash Flow Pain Points
+# EMAIL TEMPLATE - Daily Cash Flow Pain Points (HTML with UTM tracking)
 # ============================================================================
 
-EMAIL_TEMPLATE_1 = """Subject: Can you afford to hire that new person?
+EMAIL_SUBJECT_1 = "Can you afford to hire that new person?"
+EMAIL_HTML_1 = """<html>
+<body style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #333;">
 
-{first_name},
+<p>{first_name},</p>
 
-You're looking at the bank balance.
-You're looking at the bills due.
-You're trying to do the math in your head.
+<p>You're looking at the bank balance.<br>
+You're looking at the bills due.<br>
+You're trying to do the math in your head.</p>
 
-"Can I afford this hire?"
-"Should I wait another month?"
-"What if that big invoice doesn't come in?"
+<p>"Can I afford this hire?"<br>
+"Should I wait another month?"<br>
+"What if that big invoice doesn't come in?"</p>
 
-Every business owner asks these questions.
-But most are flying blind with spreadsheets and guesswork.
+<p>Every business owner asks these questions.<br>
+But most are flying blind with spreadsheets and guesswork.</p>
 
-I AM CFO shows you the answer in real-time:
+<p><strong>I AM CFO shows you the answer in real-time:</strong></p>
 
-✅ Today's actual cash position (not last month's)
-✅ Your burn rate this week (see where money's going)
-✅ Cash flow forecast (know what's coming in and out)
-✅ Profit by location, service, or product (know what's working)
+<p>✅ Today's actual cash position (not last month's)<br>
+✅ Your burn rate this week (see where money's going)<br>
+✅ Cash flow forecast (know what's coming in and out)<br>
+✅ Profit by location, service, or product (know what's working)</p>
 
-One {industry} company used I AM CFO to discover they had $47K more cash available than they thought. They made the hire. Best decision they made.
+<p>One {industry} company used I AM CFO to discover they had $47K more cash available than they thought. They made the hire. Best decision they made.</p>
 
-Another found they were losing $3K/month on their most popular service. Adjusted pricing. Turned it around in 30 days.
+<p>Another found they were losing $3K/month on their most popular service. Adjusted pricing. Turned it around in 30 days.</p>
 
-Real-time cash flow visibility = Better decisions.
+<p><strong>Real-time cash flow visibility = Better decisions.</strong></p>
 
-👉 See your real-time cash flow: https://info.iamcfo.com
+<p>👉 See your real-time cash flow: <a href="{tracking_link}" style="color: #0066cc; text-decoration: none;">info.iamcfo.com</a></p>
 
-Worth 15 minutes to stop guessing?
+<p>Worth 15 minutes to stop guessing?</p>
 
-— 
-Greg Pober
-CEO | I AM CFO • 954-684-9011
+<p>— <br>
+Greg Pober<br>
+CEO | I AM CFO • 954-684-9011</p>
 
-P.S. Connects to your QuickBooks/Xero Accounting Software. Set up within 24 hours. See your real cash position today."""
+<p style="font-size: 14px; color: #666;"><strong>P.S.</strong> Connects to your QuickBooks/Xero Accounting Software. Set up within 24 hours. See your real cash position today.</p>
+
+</body>
+</html>"""
+
+
+def generate_tracking_link(campaign, source, medium, content, industry=None):
+    """
+    Generate UTM-tracked link for info.iamcfo.com
+    
+    Args:
+        campaign: initial_outreach, xendoo_outreach, etc.
+        source: email
+        medium: campaign
+        content: prospect email or ID
+        industry: construction, restaurant, hvac, etc.
+    
+    Returns:
+        Full URL with UTM parameters
+    """
+    base_url = "https://info.iamcfo.com"
+    
+    # Build UTM parameters
+    params = {
+        'utm_source': source,
+        'utm_medium': medium,
+        'utm_campaign': campaign,
+        'utm_content': content
+    }
+    
+    # Add industry if available
+    if industry:
+        params['utm_term'] = industry.lower().replace(' ', '_')
+    
+    # Build query string
+    query_string = '&'.join([f"{k}={v}" for k, v in params.items()])
+    
+    return f"{base_url}?{query_string}"
 
 
 # Alternative subject lines for A/B testing
@@ -207,7 +246,7 @@ def get_prospects_to_email(batch_size=100):
         return []
 
 
-def personalize_with_claude(template, prospect):
+def personalize_with_claude(prospect):
     """Use Claude to personalize the email based on prospect data and daily pain points"""
     try:
         # Get prospect info
@@ -219,6 +258,16 @@ def personalize_with_claude(template, prospect):
         revenue = prospect.get('revenue_estimate', '$2M-$25M')
         title = prospect.get('title', 'business owner')
         industry = prospect.get('industry', '')
+        prospect_email = prospect.get('email', '')
+        
+        # Generate tracking link
+        tracking_link = generate_tracking_link(
+            campaign='initial_outreach',
+            source='email',
+            medium='campaign',
+            content=prospect_email,
+            industry=industry
+        )
         
         # Try to get industry-specific template
         industry_template = get_industry_template(industry)
@@ -249,16 +298,18 @@ Instructions:
 4. Show how I AM CFO solves this with real-time cash flow visibility
 5. Use the industry example to prove it works
 6. Keep it conversational and empathetic (NOT salesy)
-7. End with simple CTA: "See your real-time cash flow: https://info.iamcfo.com"
-8. P.S. should emphasize quick setup (30 min) and immediate visibility
+7. End with simple CTA: "See your real-time cash flow: info.iamcfo.com"
+8. P.S. should emphasize quick setup (24 hours) and immediate visibility
 9. Tone: Helpful advisor who gets their pain, not a salesperson
 10. Keep under 200 words
-11. Return ONLY the personalized email with subject line
+11. Format as HTML email body (use <p> tags, <br>, <strong>, etc.)
+12. DO NOT include subject line in the output
+13. Link should be formatted as: <a href="{tracking_link}" style="color: #0066cc; text-decoration: none;">info.iamcfo.com</a>
 
-Personalized email:"""
+HTML email body:"""
         else:
             # Use generic cash flow pain template
-            prompt = f"""Personalize this email for a business owner who struggles with daily cash flow decisions.
+            prompt = f"""Personalize this HTML email for a business owner who struggles with daily cash flow decisions.
 
 Prospect info:
 - Name: {first_name}
@@ -267,8 +318,8 @@ Prospect info:
 - Revenue: {revenue}
 - Industry: {industry if industry else 'small business'}
 
-Email template:
-{template}
+Base HTML template (personalize this):
+{EMAIL_HTML_1}
 
 Instructions:
 1. Use their first name naturally
@@ -280,9 +331,10 @@ Instructions:
 7. Keep it empathetic and helpful (NOT critical or salesy)
 8. Tone: Understanding advisor, not pushy salesperson
 9. Keep under 200 words
-10. Return ONLY the personalized email with subject line
+10. Return ONLY the HTML email body (no subject line)
+11. Link must be: <a href="{tracking_link}" style="color: #0066cc; text-decoration: none;">info.iamcfo.com</a>
 
-Personalized email:"""
+HTML email body:"""
         
         message = claude.messages.create(
             model="claude-sonnet-4-20250514",
@@ -293,68 +345,88 @@ Personalized email:"""
             }]
         )
         
-        personalized = message.content[0].text.strip()
+        personalized_html = message.content[0].text.strip()
         
-        # Extract subject and body
-        if personalized.startswith('Subject:'):
-            lines = personalized.split('\n', 1)
-            subject = lines[0].replace('Subject:', '').strip()
-            body = lines[1].strip() if len(lines) > 1 else personalized
+        # Use industry-specific subject if available, otherwise default
+        if industry_template:
+            subject = industry_template['subject']
         else:
-            # Use industry-specific subject if available, otherwise default
-            if industry_template:
-                subject = industry_template['subject']
-            else:
-                subject = 'Can you afford to hire that new person?'
-            body = personalized
+            subject = EMAIL_SUBJECT_1
         
-        return subject, body
+        # Format the HTML body with tracking link
+        personalized_html = personalized_html.format(
+            first_name=first_name,
+            industry=industry if industry else 'business',
+            tracking_link=tracking_link
+        )
+        
+        return subject, personalized_html
         
     except Exception as e:
         print(f"⚠️ Claude personalization failed for {prospect['email']}: {e}")
         
         # Fallback to basic template
-        industry_template = get_industry_template(prospect.get('industry', ''))
+        first_name = prospect.get('first_name', 'there').strip() or 'there'
+        industry = prospect.get('industry', 'business')
+        prospect_email = prospect.get('email', '')
+        
+        # Generate tracking link
+        tracking_link = generate_tracking_link(
+            campaign='initial_outreach',
+            source='email',
+            medium='campaign',
+            content=prospect_email,
+            industry=industry
+        )
+        
+        industry_template = get_industry_template(industry)
         
         if industry_template:
             subject = industry_template['subject']
-            body = f"""{first_name},
+            html_body = f"""<html>
+<body style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #333;">
 
-{industry_template['opening']}
+<p>{first_name},</p>
 
-{industry_template['pain']}
+<p>{industry_template['opening']}</p>
 
-{industry_template['question']}
+<p>{industry_template['pain']}</p>
 
-{industry_template['solution']}
+<p><strong>{industry_template['question']}</strong></p>
 
-{industry_template['example']}
+<p>{industry_template['solution']}</p>
 
-See your real-time cash flow: https://info.iamcfo.com
+<p>{industry_template['example']}</p>
 
-— 
-Greg Pober
-CEO | I AM CFO • 954-684-9011
+<p>See your real-time cash flow: <a href="{tracking_link}" style="color: #0066cc; text-decoration: none;">info.iamcfo.com</a></p>
 
-P.S. Connects to your QuickBooks/Xero Accounting Software. Set up within 24 hours. See your cash position today."""
+<p>— <br>
+Greg Pober<br>
+CEO | I AM CFO • 954-684-9011</p>
+
+<p style="font-size: 14px; color: #666;"><strong>P.S.</strong> Connects to your QuickBooks/Xero. Set up within 24 hours. See your cash position today.</p>
+
+</body>
+</html>"""
         else:
-            subject = 'Can you afford to hire that new person?'
-            body = template.format(
+            subject = EMAIL_SUBJECT_1
+            html_body = EMAIL_HTML_1.format(
                 first_name=first_name,
-                industry=prospect.get('industry', 'business')
+                industry=industry,
+                tracking_link=tracking_link
             )
         
-        return subject, body
+        return subject, html_body
 
 
-def send_email(prospect, subject, email_body):
-    """Send email via SendGrid with tracking"""
+def send_email(prospect, subject, html_body):
+    """Send HTML email via SendGrid with tracking"""
     try:
         message = Mail(
             from_email=(SENDER_EMAIL, SENDER_NAME),
             to_emails=prospect['email'],
             subject=subject,
-            plain_text_content=email_body
+            html_content=html_body  # HTML content instead of plain text
         )
         
         # Enable tracking
@@ -390,6 +462,7 @@ def main():
     print(f"💰 Focus: Real-time cash flow visibility")
     print(f"🎯 Pain points: Daily 'Can I afford this?' decisions")
     print(f"👤 Sender: {SENDER_NAME} <{SENDER_EMAIL}>")
+    print(f"🔗 Format: HTML with clean UTM-tracked links")
     print("-" * 60)
     
     # Get prospects
@@ -412,11 +485,11 @@ def main():
         
         # Personalize email with Claude
         print("  🤖 Personalizing with Claude AI...")
-        subject, personalized_email = personalize_with_claude(EMAIL_TEMPLATE_1, prospect)
+        subject, personalized_html = personalize_with_claude(prospect)
         
         # Send email
         print(f"  📤 Sending: {subject}")
-        if send_email(prospect, subject, personalized_email):
+        if send_email(prospect, subject, personalized_html):
             sent_count += 1
         else:
             failed_count += 1
