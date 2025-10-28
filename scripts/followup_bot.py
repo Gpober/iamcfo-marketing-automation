@@ -24,43 +24,43 @@ SENDER_EMAIL = 'gpober@iamcfo.com'
 SENDER_NAME = 'Greg Pober - I AM CFO'
 
 # Follow-up templates
-FOLLOWUP_2 = """Subject: Re: QB showing -$28K... but why?
+FOLLOWUP_2 = """Subject: Re: Your QuickBooks says cash dropped $28K — but why?
 
-{first_name},
+Hi {first_name},
 
-Quick question:
+Quick question — how long does it take you to answer:
 
-How long does it take you to answer:
 "Can I afford to hire right now?"
 
-QuickBooks: Export to Excel → 2-3 hours
+QuickBooks: Export → Excel → 2-3 hours
 I AM CFO: Ask AI → 3 seconds
+
+That's the difference between data and decisions.
 
 Worth a 15-min demo?
 
-https://calendly.com/greg-iamcfo/demo
+Book here: https://calendly.com/greg-iamcfo/demo
 
-- Greg
-CFO, I AM CFO"""
+— 
+Greg Pober
+CEO, I AM CFO"""
 
 FOLLOWUP_3 = """Subject: Last one from me
 
-{first_name},
+Hi {first_name},
 
-I'll stop after this.
+I'll keep this short.
 
-But if you're still pulling QuickBooks into Excel for cash flow...
+Two things QuickBooks can't do (but we can):
 
-There's a better way.
+1️⃣ Instant cash-flow analysis (no spreadsheets)
+2️⃣ AI that answers your financial questions in plain English
 
-5 businesses switched this week.
-All QB users like you.
+If you're curious → https://calendly.com/greg-iamcfo/demo
 
-15-min demo: https://calendly.com/greg-iamcfo/demo
-
-Or ignore and I'll leave you alone.
-
-- Greg"""
+— 
+Greg Pober
+CEO, I AM CFO"""
 
 def get_prospects_for_followup(step):
     """Get prospects who need follow-up"""
