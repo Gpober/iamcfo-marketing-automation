@@ -2,7 +2,7 @@ name: Email Campaign Bot
 
 on:
   schedule:
-    # Run every day at 9 AM EST (2 PM UTC)
+    # Run every day at 9 AM EST (2 PM UTC during standard time, 1 PM UTC during DST)
     - cron: '0 14 * * *'
   
   workflow_dispatch: # Allow manual trigger
@@ -11,6 +11,15 @@ on:
         description: 'Number of emails to send'
         required: false
         default: '100'
+      
+      run_followups:
+        description: 'Also run follow-up bot'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 jobs:
   send-emails:
@@ -21,9 +30,10 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
       
       - name: Install dependencies
         run: |
@@ -44,24 +54,28 @@ jobs:
         run: |
           echo "✅ Email campaign completed successfully!"
           echo "Batch size: ${{ github.event.inputs.batch_size || '100' }}"
+          echo "Time: $(date)"
       
       - name: Send notification on failure
         if: failure()
         run: |
           echo "❌ Email campaign failed! Check logs above."
+          echo "Time: $(date)"
+          exit 1
 
   send-followups:
     runs-on: ubuntu-latest
-    needs: send-emails
+    # Remove dependency - follow-ups are independent of today's emails
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
       
       - name: Install dependencies
         run: |
@@ -74,4 +88,17 @@ jobs:
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          python scripts/followup_bot.py
+          python scripts/followup_bot_2-3-3.py
+      
+      - name: Send notification on success
+        if: success()
+        run: |
+          echo "✅ Follow-up campaign completed successfully!"
+          echo "Time: $(date)"
+      
+      - name: Send notification on failure
+        if: failure()
+        run: |
+          echo "❌ Follow-up campaign failed! Check logs above."
+          echo "Time: $(date)"
+          exit 1
