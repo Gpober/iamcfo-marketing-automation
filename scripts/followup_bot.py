@@ -4,6 +4,8 @@ I AM CFO - Follow-up Email Bot
 Follow-ups focused on daily cash flow decisions
 Automatically sends to prospects who didn't reply
 Author: Greg Pober
+
+TIMING: 2 days / 3 days / 3 days
 """
 
 import os
@@ -29,7 +31,7 @@ SENDER_NAME = 'Greg Pober - I AM CFO'
 # FOLLOW-UP TEMPLATES - Cash Flow Pain Points
 # ============================================================================
 
-# Follow-up #1 - 3 days after initial (Reminder of the pain)
+# Follow-up #1 - 2 days after initial (Reminder of the pain)
 FOLLOWUP_1 = """Subject: Re: Can you afford to hire that new person?
 
 {first_name},
@@ -61,7 +63,7 @@ CEO | I AM CFO • 954-684-9011
 P.S. Still connects to QuickBooks. Still takes 30 minutes to set up. Still shows your cash position today."""
 
 
-# Follow-up #2 - 5 days after follow-up #1 (Social proof + urgency)
+# Follow-up #2 - 3 days after follow-up #1 (Social proof + urgency)
 FOLLOWUP_2 = """Subject: Making decisions with month-old data
 
 {first_name},
@@ -97,7 +99,7 @@ CEO | I AM CFO • 954-684-9011
 P.S. $699/month. Or keep guessing. Your call."""
 
 
-# Follow-up #3 - 7 days after follow-up #2 (Final value reminder)
+# Follow-up #3 - 3 days after follow-up #2 (Final value reminder)
 FOLLOWUP_3 = """Subject: Last one from me
 
 {first_name},
@@ -345,14 +347,15 @@ def get_prospects_for_followup(step):
     """Get prospects who need follow-up"""
     try:
         # Calculate days since last contact
+        # TIMING: 2 days / 3 days / 3 days
         if step == 1:
-            days_ago = 3  # 3 days after initial email
+            days_ago = 2  # 2 days after initial email
             previous_step = 1  # They received initial email
         elif step == 2:
-            days_ago = 5  # 5 days after follow-up #1
+            days_ago = 3  # 3 days after follow-up #1
             previous_step = 2  # They received follow-up #1
         else:  # step == 3
-            days_ago = 7  # 7 days after follow-up #2
+            days_ago = 3  # 3 days after follow-up #2
             previous_step = 3  # They received follow-up #2
         
         cutoff_date = (datetime.now() - timedelta(days=days_ago)).isoformat()
@@ -439,13 +442,14 @@ def main():
     print("🔄 I AM CFO FOLLOW-UP BOT - Daily Cash Flow Follow-ups")
     print("=" * 60)
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"📅 TIMING: 2 days → 3 days → 3 days")
     print(f"🎯 Focus: Reinforce cash flow pain + real-time solutions")
     print("-" * 60)
     
     total_sent = 0
     
-    # Process follow-up #1 (3 days after initial)
-    print("\n📧 Processing Follow-up #1 (3 days after initial)...")
+    # Process follow-up #1 (2 days after initial)
+    print("\n📧 Processing Follow-up #1 (2 days after initial)...")
     prospects_step1 = get_prospects_for_followup(1)
     print(f"   Found {len(prospects_step1)} prospects")
     
@@ -458,8 +462,8 @@ def main():
         if i < len(prospects_step1):
             time.sleep(2)  # 2 seconds between emails
     
-    # Process follow-up #2 (5 days after follow-up #1)
-    print("\n📧 Processing Follow-up #2 (5 days after follow-up #1)...")
+    # Process follow-up #2 (3 days after follow-up #1)
+    print("\n📧 Processing Follow-up #2 (3 days after follow-up #1)...")
     prospects_step2 = get_prospects_for_followup(2)
     print(f"   Found {len(prospects_step2)} prospects")
     
@@ -472,8 +476,8 @@ def main():
         if i < len(prospects_step2):
             time.sleep(2)
     
-    # Process follow-up #3 (7 days after follow-up #2)
-    print("\n📧 Processing Follow-up #3 (7 days after follow-up #2)...")
+    # Process follow-up #3 (3 days after follow-up #2)
+    print("\n📧 Processing Follow-up #3 (3 days after follow-up #2)...")
     prospects_step3 = get_prospects_for_followup(3)
     print(f"   Found {len(prospects_step3)} prospects")
     
@@ -490,9 +494,9 @@ def main():
     print("✅ FOLLOW-UP COMPLETE!")
     print("=" * 60)
     print(f"   Total sent: {total_sent}")
-    print(f"   Follow-up #1: {len(prospects_step1)} prospects")
-    print(f"   Follow-up #2: {len(prospects_step2)} prospects")
-    print(f"   Follow-up #3: {len(prospects_step3)} prospects")
+    print(f"   Follow-up #1 (2 days): {len(prospects_step1)} prospects")
+    print(f"   Follow-up #2 (3 days): {len(prospects_step2)} prospects")
+    print(f"   Follow-up #3 (3 days): {len(prospects_step3)} prospects")
     print("=" * 60)
 
 
