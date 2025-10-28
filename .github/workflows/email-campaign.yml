@@ -2,8 +2,8 @@ name: Email Campaign Bot
 
 on:
   schedule:
-    # Run Monday-Friday at 9 AM EST (2 PM UTC)
-    - cron: '0 14 * * 1-5'
+    # Run every day at 9 AM EST (2 PM UTC)
+    - cron: '0 14 * * *'
   
   workflow_dispatch: # Allow manual trigger
     inputs:
