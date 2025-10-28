@@ -20,6 +20,28 @@ SUPABASE_SERVICE_KEY = os.getenv('SUPABASE_SERVICE_KEY')
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
 
+# Validate environment variables
+if not SUPABASE_URL:
+    print("❌ ERROR: SUPABASE_URL environment variable is not set!")
+    print("   Check your GitHub secrets at:")
+    print("   https://github.com/gpober/iamcfo-marketing-automation/settings/secrets/actions")
+    sys.exit(1)
+
+if not SUPABASE_SERVICE_KEY:
+    print("❌ ERROR: SUPABASE_SERVICE_KEY environment variable is not set!")
+    sys.exit(1)
+
+if not SENDGRID_API_KEY:
+    print("❌ ERROR: SENDGRID_API_KEY environment variable is not set!")
+    sys.exit(1)
+
+if not ANTHROPIC_API_KEY:
+    print("❌ ERROR: ANTHROPIC_API_KEY environment variable is not set!")
+    sys.exit(1)
+
+print(f"✅ SUPABASE_URL: {SUPABASE_URL}")
+print(f"✅ Environment variables loaded successfully")
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 sendgrid = SendGridAPIClient(SENDGRID_API_KEY)
 claude = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
@@ -29,29 +51,27 @@ SENDER_EMAIL = 'gpober@iamcfo.com'
 SENDER_NAME = 'Greg Pober - I AM CFO'
 
 # Email template
-EMAIL_TEMPLATE_1 = """Subject: QB showing -$28K... but why?
+EMAIL_TEMPLATE_1 = """Subject: Your QuickBooks says cash dropped $28K — but why?
 
-{first_name},
+Hi {first_name},
 
-Your QuickBooks says cash dropped $28K last month.
+QuickBooks shows your cash down $28K last month.
 
-But it doesn't tell you:
-- WHY it dropped
-- WHERE the money went
-- WHAT to do about it
+But why?
 
-We turn your QB data into answers you can act on.
-Real-time dashboards. AI-powered insights.
+Most owners spend hours exporting data and sifting through spreadsheets trying to find the answer.
 
-Worth a 15-min look?
+I AM CFO gives you real-time dashboards that turn QuickBooks data into insights you can act on — instantly.
 
-Best,
+No more guesswork. Just clarity.
+
+👉 Worth a 15-minute look? https://info.iamcfo.com
+
+— 
 Greg Pober
-CEO, I AM CFO
-P: 954-257-2856
-https://info.iamcfo.com
+CEO | I AM CFO • 954-684-9011
 
-P.S. We just helped a {revenue_estimate} company discover they were losing $4K/month in unnecessary vendor payments. Found it in 10 minutes."""
+P.S. We just helped a $2-5M company find $4K a month in hidden vendor costs — in 10 minutes."""
 
 def get_prospects_to_email(batch_size=100):
     """Get next batch of prospects who haven't been emailed"""
@@ -205,6 +225,7 @@ def main():
             failed_count += 1
         
         # Rate limiting: 10 seconds between emails
+        # This keeps us under SendGrid's limits and looks more natural
         if i < len(prospects):
             print("  ⏳ Waiting 10 seconds...")
             time.sleep(10)
