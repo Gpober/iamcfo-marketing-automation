@@ -250,15 +250,20 @@ def personalize_with_claude(prospect):
     """Use Claude to personalize the email based on prospect data and daily pain points"""
     try:
         # Get prospect info
-        first_name = prospect.get('first_name', 'there').strip()
-        if not first_name:
-            first_name = 'there'
-        
+        first_name = prospect.get('first_name', '').strip()
         company = prospect.get('company', 'your company')
         revenue = prospect.get('revenue_estimate', '$2M-$25M')
         title = prospect.get('title', 'business owner')
         industry = prospect.get('industry', '')
         prospect_email = prospect.get('email', '')
+        
+        # Determine greeting - use company name if no first name
+        if not first_name:
+            greeting = f"At {company}"
+            greeting_context = f"Address them as 'At {company}' since we don't have their first name. Example: 'At {company}, you're probably looking at...'"
+        else:
+            greeting = first_name
+            greeting_context = f"Use their first name: {first_name}"
         
         # Generate tracking link
         tracking_link = generate_tracking_link(
@@ -277,11 +282,11 @@ def personalize_with_claude(prospect):
             prompt = f"""Personalize this email for a business owner who struggles with daily cash flow decisions.
 
 Prospect info:
-- Name: {first_name}
 - Company: {company}
 - Title: {title}
 - Revenue: {revenue}
 - Industry: {industry}
+- Greeting: {greeting_context}
 
 Industry-specific pain point:
 Subject: {industry_template['subject']}
@@ -292,7 +297,7 @@ Solution: {industry_template['solution']}
 Example: {industry_template['example']}
 
 Instructions:
-1. Use their first name naturally
+1. {greeting_context}
 2. Start with the industry-specific pain point (it's relatable and real)
 3. Make it feel like you understand THEIR specific daily struggle
 4. Show how I AM CFO solves this with real-time cash flow visibility
@@ -312,17 +317,17 @@ HTML email body:"""
             prompt = f"""Personalize this HTML email for a business owner who struggles with daily cash flow decisions.
 
 Prospect info:
-- Name: {first_name}
 - Company: {company}
 - Title: {title}
 - Revenue: {revenue}
 - Industry: {industry if industry else 'small business'}
+- Greeting: {greeting_context}
 
 Base HTML template (personalize this):
 {EMAIL_HTML_1}
 
 Instructions:
-1. Use their first name naturally
+1. {greeting_context}
 2. Focus on the daily pain: "Can I afford this?" decisions
 3. Emphasize real-time cash flow visibility (that's what we solve)
 4. Make it relatable - every business owner asks these questions
@@ -353,9 +358,9 @@ HTML email body:"""
         else:
             subject = EMAIL_SUBJECT_1
         
-        # Format the HTML body with tracking link
+        # Format the HTML body with tracking link and greeting
         personalized_html = personalized_html.format(
-            first_name=first_name,
+            first_name=greeting,
             industry=industry if industry else 'business',
             tracking_link=tracking_link
         )
@@ -366,9 +371,16 @@ HTML email body:"""
         print(f"⚠️ Claude personalization failed for {prospect['email']}: {e}")
         
         # Fallback to basic template
-        first_name = prospect.get('first_name', 'there').strip() or 'there'
+        first_name = prospect.get('first_name', '').strip()
+        company = prospect.get('company', 'your company')
         industry = prospect.get('industry', 'business')
         prospect_email = prospect.get('email', '')
+        
+        # Use company name if no first name
+        if not first_name:
+            greeting = f"At {company}"
+        else:
+            greeting = first_name
         
         # Generate tracking link
         tracking_link = generate_tracking_link(
@@ -386,7 +398,7 @@ HTML email body:"""
             html_body = f"""<html>
 <body style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #333;">
 
-<p>{first_name},</p>
+<p>{greeting},</p>
 
 <p>{industry_template['opening']}</p>
 
@@ -411,7 +423,7 @@ CEO | I AM CFO • 954-684-9011</p>
         else:
             subject = EMAIL_SUBJECT_1
             html_body = EMAIL_HTML_1.format(
-                first_name=first_name,
+                first_name=greeting,
                 industry=industry,
                 tracking_link=tracking_link
             )
