@@ -47,9 +47,12 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 sendgrid = SendGridAPIClient(SENDGRID_API_KEY)
 claude = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
-BATCH_SIZE = int(os.getenv('BATCH_SIZE', 100))
+BATCH_SIZE = int(os.getenv('BATCH_SIZE', 500))  # Increased for upgraded plan
 SENDER_EMAIL = 'gpober@iamcfo.com'
 SENDER_NAME = 'Greg Pober - I AM CFO'
+
+# Daily send limit tracking (50K/month = ~1,600/day)
+DAILY_SEND_LIMIT = 500  # Conservative limit (can go higher if needed)
 
 # ============================================================================
 # EMAIL TEMPLATE - Daily Cash Flow Pain Points (HTML with UTM tracking)
@@ -470,7 +473,8 @@ def main():
     print("🚀 I AM CFO EMAIL CAMPAIGN - Daily Cash Flow Solutions")
     print("=" * 60)
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"📧 Batch size: {BATCH_SIZE}")
+    print(f"📧 Daily send limit: {DAILY_SEND_LIMIT} emails")
+    print(f"📊 Batch size for today: {BATCH_SIZE}")
     print(f"💰 Focus: Real-time cash flow visibility")
     print(f"🎯 Pain points: Daily 'Can I afford this?' decisions")
     print(f"👤 Sender: {SENDER_NAME} <{SENDER_EMAIL}>")
@@ -481,15 +485,49 @@ def main():
     prospects = get_prospects_to_email(BATCH_SIZE)
     
     if not prospects:
-        print("ℹ️ No prospects to email. Add more to the database!")
-        print("\nTo add prospects:")
-        print("  python scripts/upload_prospects.py prospects.csv")
+        print("ℹ️ No prospects to email. All caught up!")
+        print("\nStatus:")
+        # Get total counts
+        total_result = supabase.table('prospects').select('*', count='exact').execute()
+        sent_result = supabase.table('prospects').select('*', count='exact').eq('email_sent', True).execute()
+        
+        total_count = total_result.count if hasattr(total_result, 'count') else len(total_result.data)
+        sent_count = sent_result.count if hasattr(sent_result, 'count') else len(sent_result.data)
+        remaining = total_count - sent_count
+        
+        print(f"  📊 Total prospects: {total_count}")
+        print(f"  ✅ Emails sent: {sent_count}")
+        print(f"  ⏳ Remaining: {remaining}")
+        
+        if remaining > 0:
+            print(f"\n💡 {remaining} prospects remaining - they'll be sent tomorrow!")
+        else:
+            print(f"\n🎉 All prospects have been contacted!")
+        
         return
     
-    print(f"📧 Found {len(prospects)} prospects to email")
+    print(f"📧 Sending to {len(prospects)} prospects today")
+    
+    # Calculate campaign progress
+    total_result = supabase.table('prospects').select('*', count='exact').execute()
+    sent_result = supabase.table('prospects').select('*', count='exact').eq('email_sent', True).execute()
+    
+    total_count = total_result.count if hasattr(total_result, 'count') else len(total_result.data)
+    sent_count = sent_result.count if hasattr(sent_result, 'count') else len(sent_result.data)
+    remaining = total_count - sent_count - len(prospects)
+    
+    days_remaining = (remaining + DAILY_SEND_LIMIT - 1) // DAILY_SEND_LIMIT  # Round up
+    
+    print(f"📊 Campaign Progress:")
+    print(f"  Total prospects: {total_count}")
+    print(f"  Already sent: {sent_count}")
+    print(f"  Sending today: {len(prospects)}")
+    print(f"  Remaining after today: {remaining}")
+    if remaining > 0:
+        print(f"  ⏰ Days remaining: ~{days_remaining} days")
     print("-" * 60)
     
-    sent_count = 0
+    sent_count_today = 0
     failed_count = 0
     
     for i, prospect in enumerate(prospects, 1):
@@ -502,7 +540,7 @@ def main():
         # Send email
         print(f"  📤 Sending: {subject}")
         if send_email(prospect, subject, personalized_html):
-            sent_count += 1
+            sent_count_today += 1
         else:
             failed_count += 1
         
@@ -513,12 +551,27 @@ def main():
             time.sleep(10)
     
     print("\n" + "=" * 60)
-    print("✅ CAMPAIGN COMPLETE!")
+    print("✅ TODAY'S BATCH COMPLETE!")
     print("=" * 60)
-    print(f"   Sent: {sent_count}")
+    print(f"   Sent today: {sent_count_today}")
     print(f"   Failed: {failed_count}")
-    print(f"   Success rate: {(sent_count/(sent_count+failed_count)*100):.1f}%")
+    print(f"   Success rate: {(sent_count_today/(sent_count_today+failed_count)*100):.1f}%")
     print(f"   Total time: ~{len(prospects) * 10 / 60:.1f} minutes")
+    
+    # Show next run info
+    new_remaining = remaining
+    if new_remaining > 0:
+        print(f"\n📅 NEXT RUN:")
+        print(f"   Prospects remaining: {new_remaining}")
+        print(f"   Will send: {min(DAILY_SEND_LIMIT, new_remaining)} emails")
+        print(f"   Days until complete: ~{days_remaining} days")
+    else:
+        print(f"\n🎉 ALL PROSPECTS CONTACTED!")
+        print(f"   Follow-ups will start automatically:")
+        print(f"   • Day 2: First follow-up")
+        print(f"   • Day 5: Second follow-up")
+        print(f"   • Day 8: Third follow-up")
+    
     print("=" * 60)
     
     # Update daily analytics
