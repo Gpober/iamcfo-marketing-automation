@@ -10,7 +10,7 @@ on:
       batch_size:
         description: 'Number of emails to send'
         required: false
-        default: '100'
+        default: '500'  # Updated for upgraded SendGrid plan (50K/month)
       
       run_followups:
         description: 'Also run follow-up bot'
@@ -45,7 +45,7 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          BATCH_SIZE: ${{ github.event.inputs.batch_size || '100' }}
+          BATCH_SIZE: ${{ github.event.inputs.batch_size || '500' }}
         run: |
           python scripts/email_bot.py
       
@@ -53,7 +53,7 @@ jobs:
         if: success()
         run: |
           echo "✅ Email campaign completed successfully!"
-          echo "Batch size: ${{ github.event.inputs.batch_size || '100' }}"
+          echo "Batch size: ${{ github.event.inputs.batch_size || '500' }}"
           echo "Time: $(date)"
       
       - name: Send notification on failure
