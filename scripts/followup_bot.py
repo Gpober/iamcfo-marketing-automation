@@ -472,9 +472,16 @@ def get_prospects_for_followup(step):
 def send_followup(prospect, step):
     """Send follow-up email with industry-specific template if available"""
     try:
-        first_name = prospect.get('first_name', 'there').strip() or 'there'
+        first_name = prospect.get('first_name', '').strip()
+        company = prospect.get('company', 'your company')
         industry = prospect.get('industry', '')
         prospect_email = prospect.get('email', '')
+        
+        # Determine greeting - use company name if no first name
+        if not first_name:
+            greeting = f"At {company}"
+        else:
+            greeting = first_name
         
         # Generate tracking link
         campaign = f"followup_{step}"
@@ -493,7 +500,7 @@ def send_followup(prospect, step):
             # Use industry-specific template
             subject = industry_subject
             html_body = industry_template.format(
-                first_name=first_name,
+                first_name=greeting,
                 industry=industry,
                 tracking_link=tracking_link
             )
@@ -510,7 +517,7 @@ def send_followup(prospect, step):
                 html_body = FOLLOWUP_3_HTML
             
             html_body = html_body.format(
-                first_name=first_name,
+                first_name=greeting,
                 industry=industry if industry else 'business',
                 tracking_link=tracking_link
             )
