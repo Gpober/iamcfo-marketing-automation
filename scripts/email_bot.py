@@ -253,8 +253,8 @@ def get_prospects_to_email(batch_size=100):
 def personalize_with_claude(prospect):
     """Use Claude to personalize the email based on prospect data and daily pain points"""
     try:
-        # Get prospect info
-        first_name = prospect.get('first_name', '').strip()
+        # Get prospect info - FIXED: Handle None values properly
+        first_name = (prospect.get('first_name') or '').strip()
         company = prospect.get('company', 'your company')
         revenue = prospect.get('revenue_estimate', '$2M-$25M')
         title = prospect.get('title', 'business owner')
@@ -374,8 +374,8 @@ HTML email body:"""
     except Exception as e:
         print(f"⚠️ Claude personalization failed for {prospect['email']}: {e}")
         
-        # Fallback to basic template
-        first_name = prospect.get('first_name', '').strip()
+        # Fallback to basic template - FIXED: Handle None values properly
+        first_name = (prospect.get('first_name') or '').strip()
         company = prospect.get('company', 'your company')
         industry = prospect.get('industry', 'business')
         prospect_email = prospect.get('email', '')
