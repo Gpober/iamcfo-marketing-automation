@@ -94,7 +94,8 @@ But most are flying blind with spreadsheets and guesswork.</p>
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 <p style="font-size: 14px; color: #666;"><strong>P.S.</strong> Connects to your QuickBooks/Xero Accounting Software. Set up within 24 hours. See your real cash position today.</p>
 
@@ -417,7 +418,8 @@ HTML email body:"""
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 <p style="font-size: 14px; color: #666;"><strong>P.S.</strong> Connects to your QuickBooks/Xero. Set up within 24 hours. See your cash position today.</p>
 
