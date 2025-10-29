@@ -60,7 +60,8 @@ Take on that new project?</p>
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 <p style="font-size: 14px; color: #666;"><strong>P.S.</strong> Still connects to QuickBooks. Still takes 30 minutes to set up. Still shows your cash position today.</p>
 
@@ -101,7 +102,8 @@ You're planning purchases without knowing today's cash position.</p>
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 <p style="font-size: 14px; color: #666;"><strong>P.S.</strong> $699/month. Or keep guessing. Your call.</p>
 
@@ -133,7 +135,9 @@ FOLLOWUP_3_HTML = """<html>
 <p>See it: <a href="{tracking_link}" style="color: #0066cc; text-decoration: none;">info.iamcfo.com</a></p>
 
 <p>— <br>
-Greg</p>
+Greg Pober<br>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 <p style="font-size: 14px; color: #666;"><strong>P.S.</strong> If you're good with month-old data and spreadsheet math, ignore this. If you want to see your cash position today, click the link.</p>
 
@@ -172,7 +176,8 @@ INDUSTRY_FOLLOWUPS = {
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 </body>
 </html>""",
@@ -197,7 +202,8 @@ CEO | I AM CFO • 954-684-9011</p>
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 </body>
 </html>""",
@@ -219,7 +225,9 @@ CEO | I AM CFO • 954-684-9011</p>
 <p><a href="{tracking_link}" style="color: #0066cc; text-decoration: none;">info.iamcfo.com</a></p>
 
 <p>— <br>
-Greg</p>
+Greg Pober<br>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 </body>
 </html>"""
@@ -251,7 +259,8 @@ Greg</p>
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 </body>
 </html>""",
@@ -278,7 +287,8 @@ CEO | I AM CFO • 954-684-9011</p>
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 </body>
 </html>""",
@@ -296,7 +306,9 @@ CEO | I AM CFO • 954-684-9011</p>
 <p><a href="{tracking_link}" style="color: #0066cc; text-decoration: none;">info.iamcfo.com</a></p>
 
 <p>— <br>
-Greg</p>
+Greg Pober<br>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 </body>
 </html>"""
@@ -326,7 +338,8 @@ Greg</p>
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 </body>
 </html>""",
@@ -356,7 +369,8 @@ CEO | I AM CFO • 954-684-9011</p>
 
 <p>— <br>
 Greg Pober<br>
-CEO | I AM CFO • 954-684-9011</p>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 </body>
 </html>""",
@@ -378,7 +392,9 @@ CEO | I AM CFO • 954-684-9011</p>
 <p><a href="{tracking_link}" style="color: #0066cc; text-decoration: none;">info.iamcfo.com</a></p>
 
 <p>— <br>
-Greg</p>
+Greg Pober<br>
+CEO | I AM CFO<br>
+<a href="mailto:gpober@iamcfo.com" style="color: #0066cc; text-decoration: none;">gpober@iamcfo.com</a> • 954-684-9011</p>
 
 </body>
 </html>"""
